@@ -591,7 +591,7 @@ export function setupPrimary() {
             if (err) {
               if (err.code == "ERR_IPC_CHANNEL_CLOSED" || err.code == "EPIPE") {
                 console.warn(
-                  `There were a synchronization problem. Wrong attempt to send a message to a disconnected worker`
+                  `There was a synchronization problem. Wrong attempt to send a message to a disconnected worker`
                 );
                 console.log(err);
               } else {
