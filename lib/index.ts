@@ -579,13 +579,22 @@ export function setupPrimary() {
   cluster.on("exit", (worker) => {
     // notify all active workers
     for (const workerId in cluster.workers) {
-      if (hasOwnProperty.call(cluster.workers, workerId)) {
-        cluster.workers[workerId].send({
-          source: MESSAGE_SOURCE,
-          type: EventType.WORKER_EXIT,
-          data: worker.id,
-        });
-      }
+        if (hasOwnProperty.call(cluster.workers, workerId)) {
+            cluster.workers[workerId].send({
+                source: MESSAGE_SOURCE,
+                type: EventType.WORKER_EXIT,
+                data: worker.id,
+            }, (err) => {
+                if (err) {
+                    if (err.code == 'ERR_IPC_CHANNEL_CLOSED' || err.code == 'EPIPE') {
+                        console.warn(`There were a synchronization problem. Wrong attempt to send a message to a disconnected worker`)
+                        console.log(err);
+                    } else {
+                        throw err;
+                    }
+                }
+            });
+        }
     }
   });
 }
